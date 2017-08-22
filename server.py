@@ -12,24 +12,30 @@ conn.execute('''CREATE TABLE IF NOT EXISTS USER
 
 ch = int(input("1.Sign Up 2.Login: "))
 
+def index_calc(string):
+
+	index = 0
+	for s in string:
+		index += ord(s)
+
+	return index%10
+
 if ch == 1:
 
 	username = input("Username: ")
 	password = input("Enter password: ")
+	hashname = hashlib.md5(username.encode('utf-8')).hexdigest()
 
-	index = 0
-	for pwd in password:
-		index += ord(pwd)
-
-	index = index%10
-	print(index)
 	honeywords = []
+
+	index = index_calc(hashname)
 
 	for i in range(10):
 		if i == index:
 			honeywords.append(password)
 		else:
 			pwd = passwords[random.randint(1, 999999)]
+			print(pwd)
 			honeywords.append(pwd)
 	
 		honeywords[i] = hashlib.md5(honeywords[i].encode('utf-8')).hexdigest()
@@ -43,10 +49,22 @@ if ch == 1:
 else:
 
 	username = input("Username: ")
+	password = input("Password: ")
+	hashname = hashlib.md5(username.encode('utf-8')).hexdigest()
+	index = index_calc(hashname)
+	hashword = hashlib.md5(password.encode('utf-8')).hexdigest()
+
 	curr = conn.cursor()
 	curr.execute('SELECT PASSWORD FROM USER WHERE USERNAME=?',(username,))
 	
 	rows = curr.fetchall()
 	lst = eval(''.join(rows[0]))
-	for l in lst:
-		print(l)
+	i = lst.index(hashword) if hashword in lst else -1
+	if i == index:
+		print('Success')
+	elif i == -1:
+		print('Fail')
+	else:
+		print('Honeyword')
+
+		
