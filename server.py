@@ -12,14 +12,6 @@ conn.execute('''CREATE TABLE IF NOT EXISTS USER
 
 ch = int(input("1.Sign Up 2.Login: "))
 
-def index_calc(string):
-
-	index = 0
-	for s in string:
-		index += ord(s)
-
-	return index%10
-
 if ch == 1:
 
 	username = input("Username: ")
@@ -41,7 +33,7 @@ if ch == 1:
 		honeywords[i] = hashlib.md5(honeywords[i].encode('utf-8')).hexdigest()
 
 	stringified = repr(honeywords)
-	print(stringified)
+	print(len(stringified))
 
 	conn.execute('INSERT INTO USER (USERNAME, PASSWORD) VALUES (?,?)',(username, stringified))
 	conn.commit()
