@@ -12,6 +12,10 @@ def login():
 	pwd = request.form['pass']
 	return render_template('res.html', user = user, pwd = pwd)
 
+@app.route('/signup', methods=['POST'])
+def signup():
+	return render_template('res.html', user = 'boobie', pwd = 'pwd')
+
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
 
