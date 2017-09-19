@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, flash
 from datetime import datetime
 from db_models import User, db
 import hashlib, random
@@ -15,7 +15,8 @@ def index_calc(string):
 	return index%10
 
 app = Flask(__name__)
-
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/anuraag/Projects/honeywords/user.db'
 @app.route('/')
 def homepage():
 	return render_template('index.html')
@@ -34,11 +35,12 @@ def login():
 	lst = eval(''.join(user.password))
 	i = lst.index(hashword) if hashword in lst else -1
 	if i == index:
-		flash('Success')
+		return 'OK'
 	elif i == -1:
-		flash('Fail')
+		return 'WRONG'
 	else:
-		flash('Honeyword')
+		return('Honeyword')
+	
 
 @app.route('/signup/', methods=['POST'])
 def signup():
@@ -68,6 +70,11 @@ def signup():
 	db.session.commit()
 	flash('Successfully Added')
 
+	return 'OK'
+
 if __name__ == '__main__':
+	db.init_app(app)
+	db.create_all()
+	app.secret_key = 'secret'
 	app.run(debug=True, use_reloader=True)
 
