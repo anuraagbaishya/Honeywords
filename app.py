@@ -1,22 +1,26 @@
 from flask import Flask, render_template, request, url_for, flash
 from datetime import datetime
-from db_models import User, db
-import hashlib, random
+from db_models import User, Index, db
+import hashlib, random, os, boto3
+
+kms = boto3.client('kms', region_name='eu-central-1')
+key_id = 'alias/honeywords'
 
 f = open("password")
 passwords = f.read().splitlines()
 
-def index_calc(string):
+def kms_encrypt_index(index):
+	enc = kms.encrypt(KeyId=key_id, Plaintext=str(index))
+	return enc['CiphertextBlob']
 
-	index = 0
-	for s in string:
-		index += ord(s)
-
-	return index%10
+def kms_decrypt_index(ctb):
+	dec = kms.decrypt(CiphertextBlob=ctb)
+	return int(dec['Plaintext'])
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/anuraag/Projects/honeywords/user.db'
+app.config['SQLALCHEMY_BINDS'] = { 'index': 'sqlite:////home/anuraag/Projects/honeywords/index.db'}
 @app.route('/')
 def homepage():
 	return render_template('index.html')
@@ -25,9 +29,10 @@ def homepage():
 def login():
 	username = request.form['user']
 	password = request.form['pass']
-
-	hashname = hashlib.md5(username.encode('utf-8')).hexdigest()
-	index = index_calc(hashname)
+	
+	enc_i = Index.query.filter_by(username=username).first().index
+	index = kms_decrypt_index(enc_i)
+	
 	hashword = hashlib.md5(password.encode('utf-8')).hexdigest()
 
 	user = User.query.filter_by(username=username).first()
@@ -51,7 +56,9 @@ def signup():
 
 	honeywords = []
 
-	index = index_calc(hashname)
+	index = (int.from_bytes(os.urandom(1), byteorder='little')%10)
+
+	print(index)
 
 	for i in range(10):
 		if i == index:
@@ -64,11 +71,16 @@ def signup():
 		honeywords[i] = hashlib.md5(honeywords[i].encode('utf-8')).hexdigest()
 
 	stringified = repr(honeywords)
-	
+
+	encrypted_index = kms_encrypt_index(index)
+
 	user = User(username, stringified)
 	db.session.add(user)
 	db.session.commit()
-	flash('Successfully Added')
+	
+	index = Index(username, encrypted_index)
+	db.session.add(index)
+	db.session.commit()
 
 	return 'OK'
 
