@@ -40,7 +40,7 @@ def login():
 	lst = eval(''.join(user.password))
 	i = lst.index(hashword) if hashword in lst else -1
 	if i == index:
-		return 'OK'
+		return render_template('home-index.html')
 	elif i == -1:
 		return 'WRONG'
 	else:
