@@ -1,0 +1,42 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+  		<title>Error Page</title>
+		<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+	</head>  	
+	<body background="{{ url_for('static', filename='images/error-bg.jpeg') }}">
+
+		<div class="main-text">
+			<p>You have entered a Honeyword.</p>
+			<p id='next-line'>This will be reported to the admin</p>
+		</div>
+	
+	</body>
+
+<style>
+	.main-text{
+
+		height: 200px;
+    	width: 1200px;
+    	font-size: 72px;
+    	color: #ffffff;
+	    position: fixed;
+	    font-family: 'Lato', sans-serif;
+    	top: 50%;
+    	left: 50%;
+    	margin-top: -150px;
+    	margin-left: -500px;
+	}
+	#next-line{
+		height: 200px;
+    	width: 1200px;
+    	font-size: 42px;
+    	color: #ffffff;
+	    position: fixed;
+	    font-family: 'Lato', sans-serif;
+    	top: 50%;
+    	left: 50%;
+    	margin-top: 50px;
+    	margin-left: -500px;	
+	}
+</html>

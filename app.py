@@ -42,9 +42,9 @@ def login():
 	if i == index:
 		return render_template('home-index.html')
 	elif i == -1:
-		return 'WRONG'
+		return render_template('error-w.html')
 	else:
-		return('Honeyword')
+		return render_template('error-h.html')
 	
 
 @app.route('/signup/', methods=['POST'])
@@ -82,7 +82,7 @@ def signup():
 	db.session.add(index)
 	db.session.commit()
 
-	return 'OK'
+	return render_template('home-index.html')
 
 if __name__ == '__main__':
 	db.init_app(app)
